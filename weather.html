@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+    <title>Weather app</title>
+    <head>
+        <link rel="stylesheet" href ="weather.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        
+    </head>
+
+    <body>
+        
+        <div class="splash">
+              
+            <h1>  Weather Forecast</h1> 
+        </div>
+          
+             
+        <form id="search-form">
+            <input type="search"
+            placeholder="Enter City Name"
+            id="search-input"
+            required
+            autocomplete="off"
+            />
+            <br>
+
+        </br>
+        <button id="search-button" >Search</button>
+        
+      <input type="text" name="lattitude" id="lat" style="display: none;">
+      <input type="text" name="longitude" id="long" style="display: none;">
+      <input type="submit" value="submit" style="display: none;">
+
+        </form>
+       
+        <div id="head">
+            <h2 class="location">
+              
+            </h2>
+            <p id="date" style="text-transform: uppercase;">WED  nov 23  10:49AM</p>
+          </div>
+
+        <main id="app-container">
+            <div id="location">
+                <p>-------</p>
+            </div>
+                <div id="temp">
+                    <img id="temp-icon" src="./icons/sun.svg" alt="">
+                    <p><span id="temp-value">-----</span> <span id="temp-unit" >&#176c</span> </p>
+                    
+                </div>
+
+                <div id="climate">
+                    <p>------</p>
+                </div>
+        </main>
+<script>
+    let loc =document.getElementById("location");
+let tempicon=document.getElementById("temp-icon");
+let tempvalue=document.getElementById("temp-value");
+let climate =document.getElementById("climate");
+let iconfile;
+const searchInput=document.getElementById("search-input");
+const searchButton=document.getElementById("search-button");
+
+searchButton.addEventListener('click', (e)=>
+{
+
+e.preventDefault();
+getWeather(searchInput.value);
+searchInput.value='';
+
+
+});
+const getWeather=async (city)=>
+{
+    try{
+
+        const response= await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=f95968fff5b77aafaa034b68fdcfdd57`,
+   
+            {mode: 'cors'}
+        );
+
+        const weatherData= await response.json();
+        console.log(weatherData);
+        const{name}=weatherData;
+        const{feels_like}=weatherData.main;
+        const{id,main}=weatherData.weather[0];
+        loc.textContent=name;
+        climate.textContent=main;
+        tempvalue.textContent=Math.round(feels_like-273);
+        if(id<300 && id>200)
+        {
+            tempicon.src=""
+        }
+       else  if(id<400 && id>300)
+        {
+            tempicon.src="./icons/cloud-solid.svg"
+        }
+       else if(id<600&& id>500)
+        {
+            tempicon.src="./icons/rain.svg"
+        }
+       else  if(id<700 && id>600)
+        {
+            tempicon.src="./icons/snow.svg"
+        }
+       else  if(id<800 && id>700)
+        {
+            tempicon.src="./icons/clouds.svg"
+        }
+         else if(id==800)
+        {
+            tempicon.src="./icons/clouds-and-sun.svg"
+        }
+
+
+
+   
+    }
+catch(error)
+{
+    alert('city not found');
+}
+
+};
+
+
+window.addEventListener("load" ,()=>{
+
+let long;
+let lat;
+
+if(navigator.geolocation)
+{
+
+    navigator.geolocation.getCurrentPosition((position)=>
+    {
+    
+    long=position.coords.longitude;
+    lat=position.coords.latitude;
+    const proxy="https://cors-anywhere.herokuapp.com/";
+
+        const api=`${proxy}api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=f95968fff5b77aafaa034b68fdcfdd57    `
+
+        fetch(api).then((response)=>{
+
+            return response.json();
+        })
+
+        .then (data =>
+            {
+
+                    const{name}=data;
+                    const{feels_like}=data.main;
+                    const{id,main}=data.weather[0];
+
+
+                    loc.textContent=name;
+                    climate.textContent=main;
+                    tempvalue.textContent=Math.round(feels_like-273);
+                    if(id<300 && id>200)
+                    {
+                        tempicon.src="./icons/thunderstorm.svg"
+                    }
+                   else  if(id<400 && id>300)
+                    {
+                        tempicon.src="./icons/cloud-solid.svg"
+                    }
+                   else if(id<600&& id>500)
+                    {
+                        tempicon.src="./icons/rain.svg"
+                    }
+                   else  if(id<700 && id>600)
+                    {
+                        tempicon.src="./icons/snow.svg"
+                    }
+                   else  if(id<800 && id>700)
+                    {
+                        tempicon.src="./icons/clouds.svg"
+                    }
+                     else if(id==800)
+                    {
+                        tempicon.src="./icons/clouds-and-sun.svg"
+                    }
+                    console.log(data);
+            })
+}
+    
+    )}
+
+
+})
+
+
+const splash=document.querySelector('.splash');
+
+
+
+  document.addEventListener('DOMContentLoaded',(e)=>{
+    setTimeout(()=>{
+      splash.classList.add ('display-none');
+    },2000);
+  })
+
+const button= document.querySelector('.search-button');
+window.onscroll=function(){
+    var top = window.scrolly;
+    console.log(top);
+    if(top>=50){
+        header.classList.add('active');
+    }else{
+        header.classList.remove('active');
+    }
+}
+
+
+
+
+var finding_pos=`false`
+function geoFindMe() {
+  function success(position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    document.getElementById('lat').value = latitude;
+    document.getElementById('long').value = longitude;
+
+    console.log(latitude, " and  ", longitude);
+  }
+
+  function error() {
+    alert("Unable to Fetch your location, Please enter your city name");
+    console.log(error);
+  }
+
+  if (!navigator.geolocation) {
+    alert('Geolocation is not supported by your browser, Please enter your city name');
+  } else {
+    navigator.geolocation.getCurrentPosition(success, error);
+  }
+
+}
+
+if(finding_pos==='true'){
+geoFindMe();
+}
+
+const getCurrentDay = () => {
+    var weekday = new Array(7);
+    weekday[0] = "Sunday";
+    weekday[1] = "Monday";
+    weekday[2] = "Tue";
+    weekday[3] = "Wed";
+    weekday[4] = "Thursday";
+    weekday[5] = "Friday";
+    weekday[6] = "Saturday";
+
+    let currentTime = new Date();
+    let day = weekday[currentTime.getDay()];
+    return day;
+  };
+
+  const getCurrentTime = () => {
+    var months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "June",
+      "July",
+      "Aug",
+      "Sept",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    var now = new Date();
+    var month = months[now.getMonth() + 0];
+    var date = now.getDate();
+
+    let hours = now.getHours();
+    let mins = now.getMinutes();
+
+    let periods = "AM";
+
+    if (hours > 11) {
+      periods = "PM";
+      if (hours > 12) hours -= 12;
+    }
+    if (mins < 10) {
+      mins = "0" + mins;
+    }
+
+    return `${month} ${date}  ${hours}:${mins} ${periods}`;
+  };
+
+  document.getElementById('date').innerHTML = getCurrentDay() + " <br>" + getCurrentTime();
+
+</script>
+    </body>
+
+</html>
